@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16PF Personality Quiz</title>
+    <style>
+        :root { --primary: #2563eb; --secondary: #64748b; --bg: #f8fafc; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #1e293b; }
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 10px; }
+        .instruction { text-align: center; color: var(--secondary); margin-bottom: 30px; font-size: 0.9rem; }
+        .q-row { border-bottom: 1px solid #f1f5f9; padding: 20px 0; }
+        .q-text { font-weight: 500; display: block; margin-bottom: 15px; }
+        .options { display: flex; justify-content: space-between; align-items: center; max-width: 450px; margin: 0 auto; }
+        .label-text { font-size: 0.75rem; color: var(--secondary); font-weight: bold; width: 60px; text-align: center; }
+        input[type="radio"] { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); }
+        .btn-submit { display: block; width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; margin-top: 30px; transition: background 0.2s; }
+        .btn-submit:hover { background: #1d4ed8; }
+        #results { margin-top: 40px; display: none; background: #f1f5f9; padding: 20px; border-radius: 8px; }
+        .trait-item { margin-bottom: 15px; }
+        .trait-label { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; }
+        .bar-bg { background: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden; }
+        .bar-fill { background: var(--primary); height: 100%; width: 0%; transition: width 1s ease-in-out; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Personality Assessment</h1>
+    <p class="instruction">Be honest. There are no right or wrong answers. (1 = Disagree, 5 = Agree)</p>
+    
+    <form id="personalityQuiz">
+        <div id="questions-list"></div>
+        <button type="button" class="btn-submit" onclick="showResults()">Calculate My Profile</button>
+    </form>
+
+    <div id="results">
+        <h2 style="text-align: center;">Your 16 Factors</h2>
+        <div id="trait-output"></div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        "I make friends easily.", "I enjoy social gatherings.", // Warmth
+        "I can solve complex puzzles.", "I am quick to understand things.", // Reasoning
+        "I rarely feel blue.", "I am not easily frustrated.", // Stability
+        "I tend to influence others.", "I like to be the leader.", // Dominance
+        "I am always full of energy.", "I like to have a lot of fun.", // Liveliness
+        "I follow the rules.", "I believe laws should be obeyed.", // Rule-Consciousness
+        "I am not shy in social situations.", "I am a bold person.", // Social Boldness
+        "I appreciate the arts.", "I am a sensitive person.", // Sensitivity
+        "I am cautious about trusting people.", "I suspect hidden motives.", // Vigilance
+        "I have a wild imagination.", "I spend time reflecting on things.", // Abstractedness
+        "I keep my secrets to myself.", "I don't reveal much about myself.", // Privateness
+        "I often feel anxious.", "I worry about my mistakes.", // Apprehension
+        "I like to try new things.", "I am open to change.", // Openness
+        "I prefer doing things alone.", "I don't rely on others.", // Self-Reliance
+        "I want everything to be perfect.", "I follow a strict schedule.", // Perfectionism
+        "I find it hard to relax.", "I often feel under pressure." // Tension
+    ];
+
+    const traits = ["Warmth", "Reasoning", "Stability", "Dominance", "Liveliness", "Rules", "Boldness", "Sensitivity", "Vigilance", "Abstractedness", "Privateness", "Apprehension", "Openness", "Self-Reliance", "Perfectionism", "Tension"];
+
+    const list = document.getElementById('questions-list');
+    questions.forEach((q, i) => {
+        list.innerHTML += `
+            <div class="q-row">
+                <span class="q-text">${i+1}. ${q}</span>
+                <div class="options">
+                    <span class="label-text">DISAGREE</span>
+                    <input type="radio" name="q${i}" value="1" required>
+                    <input type="radio" name="q${i}" value="2">
+                    <input type="radio" name="q${i}" value="3">
+                    <input type="radio" name="q${i}" value="4">
+                    <input type="radio" name="q${i}" value="5">
+                    <span class="label-text">AGREE</span>
+                </div>
+            </div>`;
+    });
+
+    function showResults() {
+        const form = new FormData(document.getElementById('personalityQuiz'));
+        const output = document.getElementById('trait-output');
+        
+        if (Array.from(form.keys()).length < 32) {
+            alert("Please answer all questions before submitting!");
+            return;
+        }
+
+        output.innerHTML = '';
+        document.getElementById('results').style.display = 'block';
+
+        for (let i = 0; i < 16; i++) {
+            let v1 = parseInt(form.get(`q${i*2}`));
+            let v2 = parseInt(form.get(`q${(i*2)+1}`));
+            let percentage = ((v1 + v2) / 10) * 100;
+
+            output.innerHTML += `
+                <div class="trait-item">
+                    <div class="trait-label"><span>${traits[i]}</span><span>${Math.round(percentage)}%</span></div>
+                    <div class="bar-bg"><div class="bar-fill" style="width: ${percentage}%"></div></div>
+                </div>`;
+        }
+        window.scrollTo({ top: document.getElementById('results').offsetTop, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
